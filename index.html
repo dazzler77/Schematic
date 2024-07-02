@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wiring Example</title>
+<title>Schematic V0.01</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -359,18 +359,16 @@ nav .wrapper {
 <nav>
       <div class="wrapper">
         <div class="logo">
-          <a href="#">Schematic &#8623;<a>
+          <a href="#">Schematic</a>
         </div>
         <input type="radio" name="slide" id="menu_btn" /><input type="radio" name="slide" id="cancel_btn" />
         <ul class="nav_links">
           <label for="cancel_btn" class="btn cancel_btn">
             <i class="fas fa-times"></i>
           </label>
-          <li><a href="#">Home</a></li>
-		  
-          <li><a  onclick="createParentNodes()" href="#">Create Parents</a></li>
-          <li>
-            <a href="#" class="desktop_item">Nodes Menu</a>
+          <li>     <a onclick="reLayout()" href="#">Re-layout</a></li>
+          <li>    <a  onclick="createParentNodes()" href="#">Create Parents</a></li>
+          <li>    <a href="#" class="desktop_item">Nodes Menu</a>
             <input type="checkbox" id="showDrop" />
             <label for="showDrop" class="mobile_item">Nodes Menu</label>
             <ul class="drop_menu">
@@ -379,10 +377,9 @@ nav .wrapper {
               <li><a onclick="showNodes()" href="#">Nodes</a></li>
             </ul>
           </li>
-          <li>
-            <a href="#" class="desktop_item">Actions Menu</a>
+          <li>    <a href="#" class="desktop_item">Layout Menu</a>
             <input type="checkbox" id="showMega" />
-            <label for="showMega" class="mobile_item">Actions Menu</label>
+            <label for="showMega" class="mobile_item">Layout Menu</label>
             <div class="mega_box">
               <div class="content">
                 <!--  -->
@@ -409,7 +406,7 @@ nav .wrapper {
               </div>
             </div>
           </li>
-          <li><a onclick="reLayout()" href="#">Re-layout cose-bilkent</a></li>
+          
         </ul>
         <label for="menu_btn" class="btn menu_btn">
           <i class="fas fa-bars"></i>
@@ -925,4 +922,4 @@ function expandAll() {
   };
 </script>
 </body>
-	  </html>
+</html>
