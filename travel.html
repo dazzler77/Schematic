@@ -36,8 +36,8 @@
                         const distanceInKm = totalDistance / 1000; // Convert meters to kilometers
                         const durationInMin = totalDuration / 60; // Convert seconds to minutes
 
-                        const originUrl = `https://www.google.com/maps/search/?api=1&query=${originCoords[1]},${originCoords[0]}`;
-                        const destinationUrl = `https://www.google.com/maps/search/?api=1&query=${destinationCoords[1]},${destinationCoords[0]}`;
+                        const originUrl = `https://www.google.com/maps?q=${originCoords[1]},${originCoords[0]}`;
+                        const destinationUrl = `https://www.google.com/maps?q=${destinationCoords[1]},${destinationCoords[0]}`;
                         
                         document.getElementById("result").innerHTML = `
                             Total Distance: ${distanceInKm.toFixed(2)} km<br>
