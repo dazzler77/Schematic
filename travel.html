@@ -4,7 +4,6 @@
     <title>Driving Distance Calculator</title>
     <script>
         const apiKey = '5b3ce3597851110001cf6248c74dabefc3724664b633dcf68de6a7fc';  // Replace 'YOUR_API_KEY' with the generated API key
-
         async function geocode(address) {
             const url = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(address)}`;
             const response = await fetch(url);
@@ -15,7 +14,7 @@
                     const coords = data.features[0].geometry.coordinates;
                     return coords; // [longitude, latitude]
                 } else {
-                    throw new Error("No features found in geocode response.");
+                    throw new Error("No features found in geocode response for the address provided.");
                 }
             } else {
                 const errorMessage = `Geocoding request failed with status: ${response.status} - ${response.statusText}`;
@@ -29,17 +28,25 @@
             const data = await response.json();
 
             if (response.ok) {
-                if (data.routes && data.routes.length > 0) {
-                    const distance = data.routes[0].summary.distance / 1000; // Convert meters to kilometers
-                    const duration = data.routes[0].summary.duration / 60; // Convert seconds to minutes
-                    document.getElementById("result").innerHTML = `
-                        Distance: ${distance.toFixed(2)} km<br>
-                        Duration: ${duration.toFixed(2)} min<br>
-                        Origin Coordinates: (${originCoords[1]}, ${originCoords[0]})<br>
-                        Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
-                    `;
+                if (data.features && data.features.length > 0) {
+                    const segments = data.features[0].properties.segments;
+                    if (segments && segments.length > 0) {
+                        const totalDistance = segments.reduce((acc, segment) => acc + segment.distance, 0);
+                        const totalDuration = segments.reduce((acc, segment) => acc + segment.duration, 0);
+                        const distanceInKm = totalDistance / 1000; // Convert meters to kilometers
+                        const durationInMin = totalDuration / 60; // Convert seconds to minutes
+
+                        document.getElementById("result").innerHTML = `
+                            Total Distance: ${distanceInKm.toFixed(2)} km<br>
+                            Total Duration: ${durationInMin.toFixed(2)} min<br>
+                            Origin Coordinates: (${originCoords[1]}, ${originCoords[0]})<br>
+                            Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
+                        `;
+                    } else {
+                        throw new Error("No segments found in directions response.");
+                    }
                 } else {
-                    throw new Error("No routes found in directions response.");
+                    throw new Error("No features found in directions response.");
                 }
             } else {
                 const errorMessage = `Directions request failed with status: ${response.status} - ${response.statusText}`;
