@@ -9,11 +9,17 @@
             const url = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(address)}`;
             const response = await fetch(url);
             const data = await response.json();
-            if (data.features && data.features.length > 0) {
-                const coords = data.features[0].geometry.coordinates;
-                return coords; // [longitude, latitude]
+
+            if (response.ok) {
+                if (data.features && data.features.length > 0) {
+                    const coords = data.features[0].geometry.coordinates;
+                    return coords; // [longitude, latitude]
+                } else {
+                    throw new Error("No features found in geocode response.");
+                }
             } else {
-                throw new Error("Address not found");
+                const errorMessage = `Geocoding request failed with status: ${response.status} - ${response.statusText}`;
+                throw new Error(errorMessage);
             }
         }
 
@@ -22,17 +28,22 @@
             const response = await fetch(url);
             const data = await response.json();
 
-            if (data.routes && data.routes.length > 0) {
-                const distance = data.routes[0].summary.distance / 1000; // Convert meters to kilometers
-                const duration = data.routes[0].summary.duration / 60; // Convert seconds to minutes
-                document.getElementById("result").innerHTML = `
-                    Distance: ${distance.toFixed(2)} km<br>
-                    Duration: ${duration.toFixed(2)} min<br>
-                    Origin Coordinates: (${originCoords[1]}, ${originCoords[0]})<br>
-                    Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
-                `;
+            if (response.ok) {
+                if (data.routes && data.routes.length > 0) {
+                    const distance = data.routes[0].summary.distance / 1000; // Convert meters to kilometers
+                    const duration = data.routes[0].summary.duration / 60; // Convert seconds to minutes
+                    document.getElementById("result").innerHTML = `
+                        Distance: ${distance.toFixed(2)} km<br>
+                        Duration: ${duration.toFixed(2)} min<br>
+                        Origin Coordinates: (${originCoords[1]}, ${originCoords[0]})<br>
+                        Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
+                    `;
+                } else {
+                    throw new Error("No routes found in directions response.");
+                }
             } else {
-                throw new Error(data.error ? data.error.message : "Unexpected API response format");
+                const errorMessage = `Directions request failed with status: ${response.status} - ${response.statusText}`;
+                throw new Error(errorMessage);
             }
         }
 
@@ -45,8 +56,8 @@
                 const destinationCoords = await geocode(destination);
                 await getDrivingDistance(originCoords, destinationCoords);
             } catch (error) {
-                console.error("Error: " + error.message);
-                document.getElementById("result").innerText = "Error: " + error.message;
+                console.error("Error:", error);
+                document.getElementById("result").innerText = `Error: ${error.message}`;
             }
         }
     </script>
