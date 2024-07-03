@@ -22,10 +22,9 @@
             const response = await fetch(url);
             const data = await response.json();
 
-            if (data.routes) {
+            if (data.routes && data.routes.length > 0) {
                 const distance = data.routes[0].summary.distance / 1000; // Convert meters to kilometers
                 const duration = data.routes[0].summary.duration / 60; // Convert seconds to minutes
-                console.log(`Distance: ${distance} km, Duration: ${duration} min`);
                 document.getElementById("result").innerHTML = `
                     Distance: ${distance.toFixed(2)} km<br>
                     Duration: ${duration.toFixed(2)} min<br>
@@ -33,7 +32,7 @@
                     Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
                 `;
             } else {
-                console.error("Error: " + data.error.message);
+                throw new Error(data.error ? data.error.message : "Unexpected API response format");
             }
         }
 
