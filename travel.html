@@ -36,11 +36,14 @@
                         const distanceInKm = totalDistance / 1000; // Convert meters to kilometers
                         const durationInMin = totalDuration / 60; // Convert seconds to minutes
 
+                        const originUrl = `https://www.google.com/maps/search/?api=1&query=${originCoords[1]},${originCoords[0]}`;
+                        const destinationUrl = `https://www.google.com/maps/search/?api=1&query=${destinationCoords[1]},${destinationCoords[0]}`;
+                        
                         document.getElementById("result").innerHTML = `
                             Total Distance: ${distanceInKm.toFixed(2)} km<br>
                             Total Duration: ${durationInMin.toFixed(2)} min<br>
-                            Origin Coordinates: (${originCoords[1]}, ${originCoords[0]})<br>
-                            Destination Coordinates: (${destinationCoords[1]}, ${destinationCoords[0]})
+                            Origin Coordinates: <a href="${originUrl}" target="_blank">(${originCoords[1]}, ${originCoords[0]})</a><br>
+                            Destination Coordinates: <a href="${destinationUrl}" target="_blank">(${destinationCoords[1]}, ${destinationCoords[0]})</a>
                         `;
                     } else {
                         throw new Error("No segments found in directions response.");
