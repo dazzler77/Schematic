@@ -741,12 +741,13 @@ function updatePseudoEdge(parent, child) {
   }
 }
 
-// Function to show connected nodes
+  // Function to show connected nodes
   const showConnectedNodes = (nodeId) => {
     const connectedNodes = new Set([nodeId]);
     const newElements = [];
     const node = cy.getElementById(nodeId);
     const prefix = nodeId;//.substring(0, nodeId.lastIndexOf(':') + 1);
+
     parsedData.data.forEach(row => {
       if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
         connectedNodes.add(row.source);
@@ -789,7 +790,6 @@ function updatePseudoEdge(parent, child) {
       }
     }).run();
   };
-
 
   // Function to toggle the display of node labels
   const toggleNodeLabels = () => {
