@@ -752,8 +752,7 @@ function updatePseudoEdge(parent, child) {
       if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
         connectedNodes.add(row.source);
         connectedNodes.add(row.target);
-	const sourceNodePosition = node.position();
-	      
+		      
         newElements.push({
           data: {
             id: row.id,
@@ -767,7 +766,7 @@ function updatePseudoEdge(parent, child) {
           }
         }, {
           data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
-          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
+          position: { x: node.position().x + Math.random() * 80, y: node.position().y + Math.random() * 60 } // Assign random positions
         }, {
           data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
           position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
