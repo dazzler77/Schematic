@@ -752,6 +752,8 @@ function updatePseudoEdge(parent, child) {
       if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
         connectedNodes.add(row.source);
         connectedNodes.add(row.target);
+	const sourceNodePosition = node.position();
+	      
         newElements.push({
           data: {
             id: row.id,
