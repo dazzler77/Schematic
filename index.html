@@ -742,69 +742,53 @@ function updatePseudoEdge(parent, child) {
 }
 
 // Function to show connected nodes
-const showConnectedNodes = (nodeId) => {
-  const connectedNodes = new Set([nodeId]);
-  const newElements = [];
-  const node = cy.getElementById(nodeId);
-  const prefix = nodeId; //.substring(0, nodeId.lastIndexOf(':') + 1);
+  const showConnectedNodes = (nodeId) => {
+    const connectedNodes = new Set([nodeId]);
+    const newElements = [];
+    const node = cy.getElementById(nodeId);
+    const prefix = nodeId;//.substring(0, nodeId.lastIndexOf(':') + 1);
+    parsedData.data.forEach(row => {
+      if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
+        connectedNodes.add(row.source);
+        connectedNodes.add(row.target);
+        newElements.push({
+          data: {
+            id: row.id,
+            source: row.source,
+            target: row.target,
+            label: row.label,
+            sourceType: row.sourceType,
+            targetType: row.targetType,
+            sourceLabel: row.sourceType,
+            targetLabel: row.targetType
+          }
+        }, {
+          data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
+          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
+        }, {
+          data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
+          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
+        });
+      }
+    });
 
-  const screenWidth = cy.width();
-  const screenHeight = cy.height();
-  const offsetX = (screenWidth * 0.05) + (Math.random() * (screenWidth * 0.05)); // 5-10% of screen width
-  const offsetY = (screenHeight * 0.05) + (Math.random() * (screenHeight * 0.05)); // 5-10% of screen height
-
-  parsedData.data.forEach(row => {
-    if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
-      connectedNodes.add(row.source);
-      connectedNodes.add(row.target);
-
-      const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
-      const sourceNodePosition = node.position();
-
-      const newSourceX = sourceNodePosition.x + offsetX * Math.cos(randomDirection);
-      const newSourceY = sourceNodePosition.y + offsetY * Math.sin(randomDirection);
-
-      const newTargetX = sourceNodePosition.x + offsetX * Math.cos(randomDirection + Math.PI);
-      const newTargetY = sourceNodePosition.y + offsetY * Math.sin(randomDirection + Math.PI);
-
-      newElements.push({
-        data: {
-          id: row.id,
-          source: row.source,
-          target: row.target,
-          label: row.label,
-          sourceType: row.sourceType,
-          targetType: row.targetType,
-          sourceLabel: row.sourceType,
-          targetLabel: row.targetType
-        }
-      }, {
-        data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
-        position: { x: newSourceX, y: newSourceY } // Assign new positions
-      }, {
-        data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
-        position: { x: newTargetX, y: newTargetY } // Assign new positions
-      });
+    // Change color of the selected node to light green if it's a parent node, otherwise to green
+    if (cy.nodes(`[id ^= "${prefix}"]`).length > 1) {
+      node.style('background-color', 'lightgreen');
+    } else {
+      node.style('background-color', 'green');
     }
-  });
 
-  // Change color of the selected node to light green if it's a parent node, otherwise to green
-  if (cy.nodes(`[id ^= "${prefix}"]`).length > 1) {
-    node.style('background-color', 'lightgreen');
-  } else {
-    node.style('background-color', 'green');
-  }
-
-  cy.add(newElements); // Add new elements
-  
-  // Use the 'preset' layout to maintain the positions of existing nodes
-  cy.layout({
-    name: 'preset',
-    positions: function(node) {
-      return node.position();
-    }
-  }).run();
-};
+    cy.add(newElements); // Add new elements
+    
+    // Use the 'preset' layout to maintain the positions of existing nodes
+    cy.layout({
+      name: 'preset',
+      positions: function(node) {
+        return node.position();
+      }
+    }).run();
+  };
 
 
   // Function to toggle the display of node labels
