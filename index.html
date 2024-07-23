@@ -359,7 +359,7 @@ nav .wrapper {
 <nav>
       <div class="wrapper">
         <div class="logo">
-          <a href="#">&#8623;Schematic</a>
+          <a href="#">Schematic</a>
         </div>
         <input type="radio" name="slide" id="menu_btn" /><input type="radio" name="slide" id="cancel_btn" />
         <ul class="nav_links">
@@ -752,7 +752,6 @@ function updatePseudoEdge(parent, child) {
       if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
         connectedNodes.add(row.source);
         connectedNodes.add(row.target);
-		      
         newElements.push({
           data: {
             id: row.id,
@@ -766,7 +765,7 @@ function updatePseudoEdge(parent, child) {
           }
         }, {
           data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
-          position: { x: node.position().x + Math.random() * 80, y: node.position().y + Math.random() * 60 } // Assign random positions
+          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
         }, {
           data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
           position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
