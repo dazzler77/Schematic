@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Schematic V0.01</title>
+<title>Schematic V0.02</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -738,58 +738,86 @@ function updatePseudoEdge(parent, child) {
   }
 }
 
-  // Function to show connected nodes
-  const showConnectedNodes = (nodeId) => {
-    const connectedNodes = new Set([nodeId]);
-    const newElements = [];
-    const node = cy.getElementById(nodeId);
-    const prefix = nodeId;//.substring(0, nodeId.lastIndexOf(':') + 1);
-	const nodelocx = node.position().x
-	const nodelocy = node.position().y
-	
-
-    parsedData.data.forEach(row => {
-      if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
-        connectedNodes.add(row.source);
-        connectedNodes.add(row.target);
-        newElements.push({
-          data: {
-            id: row.id,
-            source: row.source,
-            target: row.target,
-            label: row.label,
-            sourceType: row.sourceType,
-            targetType: row.targetType,
-            sourceLabel: row.sourceType,
-            targetLabel: row.targetType
-          }
-        }, {
-          data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
-          position: { x: nodelocx + Math.random() * 80, y: nodelocy + Math.random() * 60 } // Assign random positions
-        }, {
-          data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
-          position: { x: nodelocx + Math.random() * 80, y: nodelocy + Math.random() * 60 } // Assign random positions
-        });
-      }
-    });
-
-    // Change color of the selected node to light green if it's a parent node, otherwise to green
-    if (cy.nodes(`[id ^= "${prefix}"]`).length > 1) {
-      node.style('background-color', 'lightgreen');
-    } else {
-      node.style('background-color', 'green');
+ // Function to show connected nodes recursively
+const showConnectedNodes = (nodeId, previouslyIdentifiedNodes = new Set()) => {
+  if (previouslyIdentifiedNodes.has(nodeId)) {
+    return; // Prevent reprocessing of the same node
+  }
+  
+  previouslyIdentifiedNodes.add(nodeId);
+  
+  const connectedNodes = new Set([nodeId]);
+  const newElements = [];
+  const node = cy.getElementById(nodeId);
+  const prefix = nodeId; //.substring(0, nodeId.lastIndexOf(':') + 1);
+  const nodelocx = node.position().x;
+  const nodelocy = node.position().y;
+  
+  const screenWidth = cy.width();
+  const screenHeight = cy.height();
+  
+  parsedData.data.forEach(row => {
+    if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
+      connectedNodes.add(row.source);
+      connectedNodes.add(row.target);
+      
+      const offsetX = (screenWidth * 0.05) + (Math.random() * (screenWidth * 0.05)); // 5-10% of screen width
+      const offsetY = (screenHeight * 0.05) + (Math.random() * (screenHeight * 0.05)); // 5-10% of screen height
+      const randomDirection = Math.random() * 2 * Math.PI; // Random direction in radians
+      
+      const newSourceX = nodelocx + offsetX * Math.cos(randomDirection);
+      const newSourceY = nodelocy + offsetY * Math.sin(randomDirection);
+      const newTargetX = nodelocx + offsetX * Math.cos(randomDirection + Math.PI);
+      const newTargetY = nodelocy + offsetY * Math.sin(randomDirection + Math.PI);
+      
+      newElements.push({
+        data: {
+          id: row.id,
+          source: row.source,
+          target: row.target,
+          label: row.label,
+          sourceType: row.sourceType,
+          targetType: row.targetType,
+          sourceLabel: row.sourceType,
+          targetLabel: row.targetType
+        }
+      }, {
+        data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
+        position: { x: newSourceX, y: newSourceY } // Assign new positions
+      }, {
+        data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
+        position: { x: newTargetX, y: newTargetY } // Assign new positions
+      });
     }
+  });
 
-    cy.add(newElements); // Add new elements
-    
-    // Use the 'preset' layout to maintain the positions of existing nodes
-    cy.layout({
-      name: 'preset',
-      positions: function(node) {
-        return node.position();
-      }
-    }).run();
-  };
+  // Change color of the selected node to light green if it's a parent node, otherwise to green
+  if (cy.nodes(`[id ^= "${prefix}"]`).length > 1) {
+    node.style('background-color', 'lightgreen');
+  } else {
+    node.style('background-color', 'green');
+  }
+
+  cy.add(newElements); // Add new elements
+  
+  // Use the 'preset' layout to maintain the positions of existing nodes
+  cy.layout({
+    name: 'preset',
+    positions: function(node) {
+      return node.position();
+    }
+  }).run();
+
+ // Collect all new connected nodes that have not been identified previously
+  const newConnectedNodes = Array.from(connectedNodes).filter(connectedNodeId => !previouslyIdentifiedNodes.has(connectedNodeId));
+
+ // Recursively show connected nodes if exactly one new connected node is found
+  if (newConnectedNodes.length === 1) {
+    showConnectedNodes(newConnectedNodes[0], previouslyIdentifiedNodes);
+  }
+  
+};
+
 
   // Function to toggle the display of node labels
   const toggleNodeLabels = () => {
