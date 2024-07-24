@@ -744,6 +744,9 @@ function updatePseudoEdge(parent, child) {
     const newElements = [];
     const node = cy.getElementById(nodeId);
     const prefix = nodeId;//.substring(0, nodeId.lastIndexOf(':') + 1);
+	const nodelocx = node.position().x
+	const nodelocy = node.position().y
+	
 
     parsedData.data.forEach(row => {
       if ((row.source === nodeId || row.target === nodeId) && !cy.getElementById(row.id).length) {
@@ -762,10 +765,10 @@ function updatePseudoEdge(parent, child) {
           }
         }, {
           data: { id: row.source, label: row.source.replace(/:/g, ':\n') },
-          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
+          position: { x: nodelocx + Math.random() * 80, y: nodelocy + Math.random() * 60 } // Assign random positions
         }, {
           data: { id: row.target, label: row.target.replace(/:/g, ':\n') },
-          position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
+          position: { x: nodelocx + Math.random() * 80, y: nodelocy + Math.random() * 60 } // Assign random positions
         });
       }
     });
