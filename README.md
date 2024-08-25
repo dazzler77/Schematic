@@ -1,2 +1,2 @@
 # Schematic
-Autonatic schematic generator
+Automatic schematic generator
