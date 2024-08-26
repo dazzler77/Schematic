@@ -633,35 +633,44 @@ console.log(parsedData);
  // Function to show edges containing specific text and their connected nodes
 const showEdges = () => {
   const edgeText = document.getElementById('edgeName').value.trim().toLowerCase();
+  
   if (edgeText) {
+    const edgeTextArray = edgeText.split(' '); // Split edgeText into an array of words
     const edgesToShow = [];
     const nodesToShow = new Set();
 
- parsedData.data.forEach(row => {
-  if (row.label && row.label.toLowerCase().includes(edgeText)) {
-    if (!row.source || row.source.trim() === "") {
-      console.error("Invalid source ID: ", row.id);
-      return; // or handle the invalid ID appropriately
-    }
-    if (!row.target || row.target.trim() === "") {
-      console.error("Invalid target ID: ", row.id);
-      return; // or handle the invalid ID appropriately
-    }
-    nodesToShow.add(row.source);
-    nodesToShow.add(row.target);
-    edgesToShow.push({
-      data: {
-        id: row.id,
-        source: row.source,
-        target: row.target,
-        label: row.label,
-        sourceType: row.sourceType,
-        targetType: row.targetType
+    parsedData.data.forEach(row => {
+      // Check if each word in edgeTextArray is present in at least one of row.label, row.source, or row.target
+      const includesAllWords = edgeTextArray.every(text => 
+        (row.label && row.label.toLowerCase().includes(text)) ||
+        (row.source && row.source.toLowerCase().includes(text)) ||
+        (row.target && row.target.toLowerCase().includes(text))
+      );
+
+      if (includesAllWords) {
+        if (!row.source || row.source.trim() === "") {
+          console.error("Invalid source ID: ", row.id);
+          return; // or handle the invalid ID appropriately
+        }
+        if (!row.target || row.target.trim() === "") {
+          console.error("Invalid target ID: ", row.id);
+          return; // or handle the invalid ID appropriately
+        }
+
+        nodesToShow.add(row.source);
+        nodesToShow.add(row.target);
+        edgesToShow.push({
+          data: {
+            id: row.id,
+            source: row.source,
+            target: row.target,
+            label: row.label,
+            sourceType: row.sourceType,
+            targetType: row.targetType
+          }
+        });
       }
     });
-  }
-});
-
 
     const nodeElements = Array.from(nodesToShow).map(node => ({
       data: { id: node, label: node.replace(/:/g, ':\n') }, // Add new lines after colons for multi-line labels
