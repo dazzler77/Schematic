@@ -682,14 +682,19 @@ const showNodes = () => {
   if (nodeText) {
     const nodesToShow = new Set();
 
-    parsedData.data.forEach(row => {
-      if (row.source && row.source.toLowerCase().includes(nodeText)) {
-        nodesToShow.add(row.source);
-      }
-      if (row.target && row.target.toLowerCase().includes(nodeText)) {
-        nodesToShow.add(row.target);
-      }
-    });
+parsedData.data.forEach(row => {
+  const nodeTextArray = nodeText.toLowerCase().split(' ');
+
+  const sourceIncludesAll = row.source && nodeTextArray.every(text => row.source.toLowerCase().includes(text));
+  const targetIncludesAll = row.target && nodeTextArray.every(text => row.target.toLowerCase().includes(text));
+
+  if (row.source && sourceIncludesAll) {
+    nodesToShow.add(row.source);
+  }
+  if (row.target && targetIncludesAll) {
+    nodesToShow.add(row.target);
+  }
+});
 
     const nodeElements = Array.from(nodesToShow).map(node => ({
       data: { id: node, label: node.replace(/:/g, ':\n') }, // Add new lines after colons for multi-line labels
