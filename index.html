@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Schematic V0.03</title>
+<title>Schematic V0.04</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -983,18 +983,39 @@ function expandAll() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  
+// Function to export the graph as a PDF file
+const saveAsPdf = function(filename) {
+    // Get the bounding box of the graph elements
+    const boundingBox = cy.elements().boundingBox();
 
-  // Function to export the graph as a PDF file
-  const saveAsPdf = function(filename) {
-    const width = cy.width() * 1.1;
-    const height = cy.height() * 1.1;
-    const pdf = new jspdf.jsPDF("p","pt", [width, height]);
+    // Define padding to ensure nothing is cut off
+    const padding = 150; // Adjust this padding value as needed
+
+    // Calculate content width and height with padding
+    const contentWidth = boundingBox.w + 2 * padding;  // Left and right padding
+    const contentHeight = boundingBox.h + 4 * padding; // Top and bottom padding
+
+    // Create a new jsPDF instance with the calculated dimensions
+    const pdf = new jspdf.jsPDF("p", "pt", [contentWidth, contentHeight]);
+
+    // Create a temporary container to hold the SVG content
     const container = document.createElement('div');
-    container.innerHTML = cy.svg();
-    pdf.svg(container.firstChild).then(() => {
-      pdf.save(filename, {width, height});
+    container.innerHTML = cy.svg({scale: 1, full: true}); // Use full to capture the whole content
+
+    // Offset the content by padding to center it
+    const svgElement = container.firstChild;
+    svgElement.setAttribute("x", padding);
+    svgElement.setAttribute("y", padding);
+
+    // Use the jsPDF SVG method to add the SVG content to the PDF
+    pdf.svg(svgElement).then(() => {
+        // Save the PDF file with the specified filename
+        pdf.save(filename);
     });
-  };
+};
+
+
 
   // Function to re-layout the graph using the cose-bilkent layout
   const reLayout = () => {
