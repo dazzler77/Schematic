@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Schematic V0.02</title>
+<title>Schematic V0.03</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -366,6 +366,12 @@ nav .wrapper {
           <label for="cancel_btn" class="btn cancel_btn">
             <i class="fas fa-times"></i>
           </label>
+		  <li>   <select id="levels">
+				  <option value="L1">Level 1</option>
+				  <option value="L2">Level 2</option>
+				  <option value="L3">Level 3</option>
+				  <option value="L4">Level 4</option>
+				</select> </li>
           <li>     <a onclick="reLayout()" href="#">Re-layout</a></li>
           <li>    <a  onclick="createParentNodes()" href="#">Create Parents</a></li>
           <li>    <a href="#" class="desktop_item">Nodes Menu</a>
@@ -631,6 +637,7 @@ console.log(parsedData);
   let nodesToShow = new Set();
 
  // Function to show edges containing specific text and their connected nodes
+// Function to show edges containing specific text and their connected nodes
 const showEdges = () => {
   const edgeText = document.getElementById('edgeName').value.trim().toLowerCase();
   
@@ -657,20 +664,54 @@ const showEdges = () => {
           return; // or handle the invalid ID appropriately
         }
 
-        nodesToShow.add(row.source);
-        nodesToShow.add(row.target);
-        edgesToShow.push({
-          data: {
-            id: row.id,
-            source: row.source,
-            target: row.target,
-            label: row.label,
-            sourceType: row.sourceType,
-            targetType: row.targetType
-          }
-        });
+    ///start newcode here
+		// Get the selected level from the HTML select element
+		const selectedLevel = document.getElementById('levels').value;
+
+		// Function to truncate string at the nth-to-last colon
+		const truncateAtNthLastColon = (str, n) => {
+			let index = str.length;
+			for (let i = 0; i < n; i++) {
+				index = str.lastIndexOf(":", index - 1);
+				if (index === -1) break;  // Exit if there are fewer than n colons
+			}
+			return index !== -1 ? str.substring(0, index) : str;  // Return truncated string or original if index is not found
+		};
+
+		// Initialize new variables for source, target, and id
+		let modifiedSource = row.source;
+		let modifiedTarget = row.target;
+		let modifiedId = row.id;
+
+		// Extract the numeric level from the selectedLevel (e.g., "L2" -> 2)
+		const levelNumber = parseInt(selectedLevel.substring(1), 10);
+
+		// Apply truncation based on level
+		if (!isNaN(levelNumber) && levelNumber > 1) {
+			// For L2, L3, etc., use the appropriate truncation
+			modifiedSource = truncateAtNthLastColon(row.source, levelNumber - 1);
+			modifiedTarget = truncateAtNthLastColon(row.target, levelNumber - 1);
+			modifiedId = `${row.id}#${levelNumber}`;  // Modify ID if needed (e.g., "#2", "#3", etc.)
+		}
+
+		nodesToShow.add(modifiedSource);
+		nodesToShow.add(modifiedTarget);
+		edgesToShow.push({
+			data: {
+				id: modifiedId,
+				source: modifiedSource,
+				target: modifiedTarget,
+				label: row.label,
+				sourceType: row.sourceType,
+				targetType: row.targetType
+			}
+		});
+
+
+		///end of newcode
       }
     });
+
 
     const nodeElements = Array.from(nodesToShow).map(node => ({
       data: { id: node, label: node.replace(/:/g, ':\n') }, // Add new lines after colons for multi-line labels
@@ -683,6 +724,8 @@ const showEdges = () => {
     cy.center(); // Center the graph
   }
 };
+
+// end of showEdges
 
 
 // Function to show nodes containing specific text
@@ -704,6 +747,8 @@ parsedData.data.forEach(row => {
     nodesToShow.add(row.target);
   }
 });
+  
+
 
     const nodeElements = Array.from(nodesToShow).map(node => ({
       data: { id: node, label: node.replace(/:/g, ':\n') }, // Add new lines after colons for multi-line labels
