@@ -396,6 +396,12 @@ nav .wrapper {
 
                   </ul>
                 </div>
+                <div class="row">
+                  <header>About</header>
+                  <ul class="mega_links first_links">
+                    <li><a>V0.04</a></li>
+                  </ul>
+                </div>
                 <!--  -->
                 <!--  -->
                 <div class="row">
@@ -712,7 +718,7 @@ const showEdges = () => {
       }
     });
 
-
+																				   
     const nodeElements = Array.from(nodesToShow).map(node => ({
       data: { id: node, label: node.replace(/:/g, ':\n') }, // Add new lines after colons for multi-line labels
       position: { x: Math.random() * 800, y: Math.random() * 600 } // Assign random positions
