@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Schematic V0.042</title>
+<title>Schematic V0.043</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -399,7 +399,7 @@ nav .wrapper {
                 <div class="row">
                   <header>About</header>
                   <ul class="mega_links first_links">
-                    <li><a>V0.042</a></li>
+                    <li><a>V0.043</a></li>
                   </ul>
                 </div>
                 <!--  -->
@@ -576,8 +576,12 @@ console.log(parsedData);
       userZoomingEnabled: true,
       boxSelectionEnabled: false,
       autolock: false, // Allow dynamic moving of nodes
-      maxZoom: 2,
-      minZoom: 0.5
+      maxZoom: 2.3,
+      minZoom: 0.5,	
+	  
+      wheelSensitivity: 0.1 // Set your desired wheel sensitivity here
+
+  
     });
 	
 
@@ -649,9 +653,7 @@ console.log(parsedData);
 
   // Initialize Cytoscape with no elements initially
   let cy = initializeCytoscape([]);
-  
-  
-  
+
   
   let labelsVisible = true;
   let edgeLabelsVisible = true; // or false, depending on the initial state
