@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Schematic V0.041</title>
+<title>Schematic V0.042</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
 <script src="https://unpkg.com/cytoscape-cxtmenu/cytoscape-cxtmenu.js"></script>
@@ -399,7 +399,7 @@ nav .wrapper {
                 <div class="row">
                   <header>About</header>
                   <ul class="mega_links first_links">
-                    <li><a>V0.041</a></li>
+                    <li><a>V0.042</a></li>
                   </ul>
                 </div>
                 <!--  -->
@@ -431,6 +431,21 @@ nav .wrapper {
 
 <script>
 
+
+document.addEventListener('DOMContentLoaded', function() {
+	var selectElement = document.getElementById('levels');
+	
+	// Retrieve and set the selected value on page load
+	var savedValue = localStorage.getItem('selectedLevel');
+	if (savedValue) {
+		selectElement.value = savedValue;
+	}
+
+	// Save the selected value to localStorage on change
+	selectElement.addEventListener('change', function() {
+		localStorage.setItem('selectedLevel', this.value);
+	});
+});
 
 // CSV data
 const csvData = `id,sourceType,targetType,source,target,label
