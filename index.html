@@ -378,7 +378,7 @@ nav .wrapper {
             <input type="checkbox" id="showDrop" />
             <label for="showDrop" class="mobile_item">Nodes Menu</label>
             <ul class="drop_menu">
-              <li><input type="text" id="edgeName" placeholder="Enter edge text"></li>
+              <li><input type="text" id="edgeName" placeholder="Enter edge text" autocomplete="off"></li>
               <li><a onclick="showEdges()" href="#">Edges</a></li>
               <li><a onclick="showNodes()" href="#">Nodes</a></li>
             </ul>
@@ -410,7 +410,7 @@ nav .wrapper {
                     <li><a onclick="exportSVG()" href="#">To SVG</a></li>
                     <li><a onclick="saveAsPdf('graph.pdf')" href="#">To PDF</a></li>
 					<input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
-					<li><a onclick="getFile()" href="#">Upload File</a></li>
+					<li><a onclick="getFile()" href="#">Open file</a></li>
                   </ul>
                 </div>
                 <!--  -->
