@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maths Times Table Challenge</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --primary-text: #333;
+            --secondary-text: #666;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --border-color: #ddd;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        #game-container {
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #question-area h2 {
+            font-size: 2.5rem;
+            margin: 0 0 20px 0;
+            color: var(--primary-text);
+        }
+
+        #answer-input {
+            width: 80%;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        #answer-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        #timer {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+            height: 25px;
+        }
+
+        #feedback {
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-height: 30px;
+            margin-bottom: 20px;
+        }
+
+        .correct {
+            color: var(--correct-color);
+        }
+
+        .incorrect {
+            color: var(--incorrect-color);
+        }
+
+        #progress {
+            font-size: 1rem;
+            color: var(--secondary-text);
+            margin-bottom: 25px;
+        }
+
+        #start-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #start-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        #game-area {
+            display: none;
+        }
+
+        #game-over-area {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="start-area">
+            <h1>Times Table Challenge</h1>
+            <p>Answer 30 questions from 1x1 to 12x12. You have 5 seconds for each!</p>
+            <button id="start-btn">Start Game</button>
+        </div>
+
+        <div id="game-area">
+            <div id="progress">Question 1 / 30</div>
+            <div id="timer">Time: 5s</div>
+            <div id="question-area">
+                <h2 id="question-text">What is 5 x 5?</h2>
+            </div>
+            <form id="answer-form">
+                <input type="number" id="answer-input" autocomplete="off" autofocus>
+            </form>
+            <div id="feedback"></div>
+        </div>
+
+        <div id="game-over-area">
+            <h1>Game Over!</h1>
+            <h2 id="final-score">You scored 0 / 30</h2>
+            <p>Well done! Practice makes perfect.</p>
+            <button id="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const startArea = document.getElementById('start-area');
+        const gameArea = document.getElementById('game-area');
+        const gameOverArea = document.getElementById('game-over-area');
+
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        const progressText = document.getElementById('progress');
+        const timerText = document.getElementById('timer');
+        const questionText = document.getElementById('question-text');
+        const answerForm = document.getElementById('answer-form');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackText = document.getElementById('feedback');
+        const finalScoreText = document.getElementById('final-score');
+
+        const TOTAL_QUESTIONS = 30;
+        const TIME_PER_QUESTION = 5;
+
+        let allQuestions = [];
+        let incorrectQuestions = [];
+        let currentQuestion = {};
+        let score = 0;
+        let questionsAsked = 0;
+        let timer;
+        let timerInterval;
+
+        function generateQuestions() {
+            allQuestions = [];
+            for (let i = 1; i <= 12; i++) {
+                for (let j = 1; j <= 12; j++) {
+                    allQuestions.push({ num1: i, num2: j, answer: i * j });
+                }
+            }
+        }
+
+        function startGame() {
+            startArea.style.display = 'none';
+            gameOverArea.style.display = 'none';
+            gameArea.style.display = 'block';
+
+            generateQuestions();
+            incorrectQuestions = [];
+            score = 0;
+            questionsAsked = 0;
+
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (questionsAsked >= TOTAL_QUESTIONS) {
+                endGame();
+                return;
+            }
+
+            questionsAsked++;
+            progressText.textContent = `Question ${questionsAsked} / ${TOTAL_QUESTIONS}`;
+            feedbackText.textContent = '';
+            answerInput.value = '';
+            answerInput.focus();
+
+            // 40% chance to pick a question from the incorrect pile, if it's not empty
+            if (incorrectQuestions.length > 0 && Math.random() < 0.4) {
+                const qIndex = Math.floor(Math.random() * incorrectQuestions.length);
+                currentQuestion = incorrectQuestions[qIndex];
+            } else {
+                const qIndex = Math.floor(Math.random() * allQuestions.length);
+                currentQuestion = allQuestions[qIndex];
+            }
+
+            questionText.textContent = `What is ${currentQuestion.num1} × ${currentQuestion.num2}?`;
+            startTimers();
+        }
+
+        function startTimers() {
+            let timeLeft = TIME_PER_QUESTION;
+            timerText.textContent = `Time: ${timeLeft}s`;
+            timerText.style.color = 'var(--secondary-text)';
+
+            // Interval to update the display every second
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.textContent = `Time: ${timeLeft}s`;
+                if (timeLeft <= 2) {
+                    timerText.style.color = 'var(--incorrect-color)';
+                }
+            }, 1000);
+
+            // Timeout for when the time runs out completely
+            timer = setTimeout(() => {
+                clearInterval(timerInterval);
+                checkAnswer(true); // true indicates time ran out
+            }, TIME_PER_QUESTION * 1000);
+        }
+
+        function checkAnswer(timeUp = false) {
+            clearTimeout(timer);
+            clearInterval(timerInterval);
+
+            const userAnswer = parseInt(answerInput.value, 10);
+            const correctAnswer = currentQuestion.answer;
+
+            if (!timeUp && userAnswer === correctAnswer) {
+                score++;
+                feedbackText.textContent = 'Correct! 🎉';
+                feedbackText.className = 'correct';
+            } else {
+                feedbackText.textContent = `Sorry, the answer was ${correctAnswer}.`;
+                feedbackText.className = 'incorrect';
+                // Add the incorrect question to the priority pile 3 times to increase its chance
+                incorrectQuestions.push(currentQuestion);
+                incorrectQuestions.push(currentQuestion);
+                incorrectQuestions.push(currentQuestion);
+            }
+            
+            // Wait a moment before showing the next question
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function endGame() {
+            gameArea.style.display = 'none';
+            gameOverArea.style.display = 'block';
+            finalScoreText.textContent = `You scored ${score} / ${TOTAL_QUESTIONS}`;
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        answerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            checkAnswer();
+        });
+
+    </script>
+</body>
+</html>
